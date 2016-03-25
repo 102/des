@@ -126,9 +126,9 @@ def encode_chunk(word, key):
     l0 = bword[0:32]
     r0 = bword[32:64]
 
-    for i in range(16):
+    for ki in generate_key(key):
         l1 = r0
-        r1 = bit_string_xor(l0, feistel(r0, generate_key(key)[i]))
+        r1 = bit_string_xor(l0, feistel(r0, ki))
         l0 = l1
         r0 = r1
 
@@ -148,16 +148,13 @@ def generate_key(key):
     c = permuted_key[0:28]
     d = permuted_key[28:56]
 
-    k = []
     for i in range(16):
         c = rotate(c, rotations[i])
         d = rotate(d, rotations[i])
-        k.append(permutate(c + d, pc2))
-
-    return k
+        yield permutate(c + d, pc2)
 
 
-def cfb_encrypt(iv, word, key):
+def cfb_encrypt(word, iv='01234567', key='76543210'):
     while not len(word) % 8 == 0:
         word += ' '
     iv = encode_word(iv, key)
@@ -173,7 +170,7 @@ def cfb_encrypt(iv, word, key):
     return result
 
 
-def cfb_decrypt(iv, cword, key):
+def cfb_decrypt(cword, iv='01234567', key='76543210'):
     iv = encode_word(iv, key)
     ct = cword[0:8]
     plaintext = bin_to_word(bit_string_xor(iv, ct))
@@ -189,8 +186,8 @@ def cfb_decrypt(iv, cword, key):
 def main():
     iv = '01234567'
     key = '87654321'
-    word = 'f'
-    print(cfb_decrypt(iv, cfb_encrypt(iv, word, key), key))
+    word = 'fsxs'
+    print(cfb_decrypt(cfb_encrypt(word)))
 
 
 if __name__ == '__main__':
