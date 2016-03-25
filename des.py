@@ -170,8 +170,9 @@ def cfb_encrypt(word, iv='01234567', key='76543210'):
     result = ct
 
     for i in range(8, len(word), 8):
+        ct = bin_to_word(ct)
         r = encode_word(ct, key)
-        ct = bit_string_xor(word_to_bin(r), word_to_bin(word[i:i+8]))
+        ct = bit_string_xor(r, word_to_bin(word[i:i+8]))
         result += ct
 
     return result
@@ -187,8 +188,9 @@ def cfb_decrypt(cword, iv='01234567', key='76543210'):
     plaintext = bin_to_word(bit_string_xor(iv, ct))
 
     for i in range(64, len(cword), 64):
+        ct = bin_to_word(ct)
         r = encode_word(ct, key)
-        ct = cword[i:i+8]
+        ct = cword[i:i+64]
         plaintext += bin_to_word(bit_string_xor(ct, r))
 
     return plaintext
@@ -197,7 +199,7 @@ def cfb_decrypt(cword, iv='01234567', key='76543210'):
 def main():
     iv = '01234567'
     key = '87654321'
-    word = 'fsxsdd'
+    word = 'fsxsddssssxssss!!xx-@'
     print(cfb_decrypt(cfb_encrypt(word)))
 
 
